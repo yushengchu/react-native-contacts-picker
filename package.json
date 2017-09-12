@@ -1,0 +1,19 @@
+{
+  "name": "react-native-contacts-picker",
+  "version": "0.0.1",
+  "description": "通讯录选择器，兼容iOS8",
+  "main": "index.js",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yushengchu/ContactPicker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yushengchu/ContactPicker/issues"
+  },
+  "homepage": "https://github.com/yushengchu/ContactPicker",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": ""
+}
