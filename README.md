@@ -20,7 +20,21 @@ import ContactPickerBridge from 'react-native-contacts-picker';
 ```
 
 ### 使用方式(iOS)
+- 安装模块
+```
+npm i react-native-contacts-picker -s
+```
+- 关联模块
+```
+react-native link react-native-contacts-picker
+```
+- 添加权限
 
+    在 `Info.plist` 中添加 `Privacy - Contacts Usage Description` 权限
+- 引入模块
+```
+import ContactPickerBridge from 'react-native-contacts-picker';
+```
 
 ### 接口说明
 
