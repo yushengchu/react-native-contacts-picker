@@ -60,6 +60,13 @@ RCT_EXPORT_METHOD(getAllContact:(RCTResponseSenderBlock)callback){
             NSString *lastName=(__bridge NSString *)(ABRecordCopyValue(people, kABPersonLastNameProperty));
             NSLog(@"--------------------------------------------------");
             
+            if (!firstName) {
+                firstName = @"";
+            }
+            if (!lastName) {
+                lastName = @"";
+            }
+            
             NSString *nameStr = [NSString stringWithFormat:@"%@%@",lastName,firstName];
             NSLog(@"userName=%@",nameStr);
             
