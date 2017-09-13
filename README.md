@@ -29,7 +29,8 @@ npm i react-native-contacts-picker -s
 react-native link react-native-contacts-picker
 ```
 - 添加权限
-在 `Info.plist` 中添加 `Privacy - Contacts Usage Description` 权限
+
+    在 `Info.plist` 中添加 `Privacy - Contacts Usage Description` 权限
 - 引入模块
 ```
 import ContactPickerBridge from 'react-native-contacts-picker';
