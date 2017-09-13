@@ -101,7 +101,7 @@ RCT_EXPORT_METHOD(checkContactPermissions:(RCTResponseSenderBlock)callback){
 
 #pragma mark - ABPeoplePickerNavigationControllerDelegate
 - (void)peoplePickerNavigationControllerDidCancel:(ABPeoplePickerNavigationController *)picker{
-    _responseCallBack(@[@{@"code":[NSNumber numberWithInt:2],@"errMsg":@"用户主动取消"}]);
+    _responseCallBack(@[@{@"code":[NSNumber numberWithInt:2],@"msg":@"用户主动取消"}]);
     [_peoplePicker dismissViewControllerAnimated:YES completion:NULL];
 }
 

@@ -1,3 +1,3 @@
-//index.js
-import React, { NativeModules } from 'react-native';
+import {NativeModules} from 'react-native';
+
 module.exports = NativeModules.RNContactPicker;
