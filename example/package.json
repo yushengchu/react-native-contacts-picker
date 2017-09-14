@@ -7,15 +7,15 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"react": "16.0.0-alpha.12",
-		"react-native": "0.48.3",
+		"react": "16.0.0-alpha.6",
+		"react-native": "0.43.4",
 		"react-native-contacts-picker": "file:../"
 	},
 	"devDependencies": {
-		"babel-jest": "21.0.2",
-		"babel-preset-react-native": "3.0.2",
-		"jest": "21.0.2",
-		"react-test-renderer": "16.0.0-alpha.12"
+		"babel-jest": "20.0.3",
+		"babel-preset-react-native": "2.1.0",
+		"jest": "20.0.4",
+		"react-test-renderer": "16.0.0-alpha.6"
 	},
 	"jest": {
 		"preset": "react-native"
