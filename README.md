@@ -1,5 +1,5 @@
 # react-native-contacts-picker
-react-native兼容iOS8的通讯录选择器
+react-native兼容iOS8的通讯录选择器，不支持rn 0.48.+
 
 ### 使用方式(Android)
 - 安装模块

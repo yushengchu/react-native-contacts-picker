@@ -202,6 +202,11 @@ public class ContactsManager extends ReactContextBaseJavaModule implements Activ
     }
   }
 
+  @Override
+  public void onNewIntent(Intent intent) {
+
+  }
+
   private void callResult(boolean foundData, WritableMap contactData) {
     if (foundData) {
       invokeCallback(createMapResult(contactData));
@@ -210,11 +215,6 @@ public class ContactsManager extends ReactContextBaseJavaModule implements Activ
       invokeCallback(createErr(1, "No data found for contact"));
       return;
     }
-  }
-
-  @Override
-  public void onNewIntent(Intent intent) {
-
   }
 
   private void invokeCallback(Object... args) {
