@@ -110,95 +110,97 @@ public class ContactsManager extends ReactContextBaseJavaModule implements Activ
 
   @Override
   public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-    switch (resultCode) {
-      case (Activity.RESULT_OK):
-        Uri contactUri = data.getData();
-        try {
+    if (requestCode == CONTACT_REQUEST) {
+      switch (resultCode) {
+        case (Activity.RESULT_OK):
+          Uri contactUri = data.getData();
+          try {
           /* Retrieve all possible data about contact and return as a JS object */
-          //First get ID
-          String id = null;
-          int idx;
-          final WritableMap contactData = Arguments.createMap();
-          Cursor cursor = this.contentResolver.query(contactUri, null, null, null, null);
-          if (cursor != null && cursor.moveToFirst()) {
-            idx = cursor.getColumnIndex(ContactsContract.Contacts._ID);
-            id = cursor.getString(idx);
-          } else {
-            invokeCallback(createErr(1, "Contact Data Not Found"));
+            //First get ID
+            String id = null;
+            int idx;
+            final WritableMap contactData = Arguments.createMap();
+            Cursor cursor = this.contentResolver.query(contactUri, null, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+              idx = cursor.getColumnIndex(ContactsContract.Contacts._ID);
+              id = cursor.getString(idx);
+            } else {
+              invokeCallback(createErr(1, "Contact Data Not Found"));
+              return;
+            }
+
+            // Build the Entity URI.
+            Uri.Builder b =
+                Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, id).buildUpon();
+            b.appendPath(ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
+            contactUri = b.build();
+
+            // Create the projection (SQL fields) and sort order.
+            String[] projection = {
+                ContactsContract.Contacts.Entity.MIMETYPE, ContactsContract.Contacts.Entity.DATA1
+            };
+            String sortOrder = ContactsContract.Contacts.Entity.RAW_CONTACT_ID + " ASC";
+            cursor = this.contentResolver.query(contactUri, projection, null, null, sortOrder);
+            if (cursor == null) return;
+
+            String mime;
+            final List<CharSequence> numbers = new ArrayList<>();
+            String name = null;
+
+            int dataIdx = cursor.getColumnIndex(ContactsContract.Contacts.Entity.DATA1);
+            int mimeIdx = cursor.getColumnIndex(ContactsContract.Contacts.Entity.MIMETYPE);
+            if (cursor.moveToFirst()) {
+              do {
+                mime = cursor.getString(mimeIdx);
+                if (name == null &&
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE.equals(mime)) {
+                  name = cursor.getString(dataIdx);
+                }
+                if (ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE.equals(mime)) {
+                  numbers.add(cursor.getString(dataIdx));
+                }
+              } while (cursor.moveToNext());
+            }
+            cursor.close();
+
+            contactData.putString("name", name);
+
+            if (numbers.size() == 1) {
+              contactData.putString("phone", String.valueOf(numbers.get(0)));
+              callResult(true, contactData);
+            } else if (numbers.size() > 1) {
+              if (mBuilder == null)
+                mBuilder = new AlertDialog.Builder(getCurrentActivity());
+              mBuilder
+                  .setTitle(name)
+                  .setItems(numbers.toArray(new CharSequence[numbers.size()]),
+                      new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                          contactData.putString("phone", String.valueOf(numbers.get(i)));
+                          callResult(true, contactData);
+                        }
+                      })
+                  .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                      invokeCallback(createErr(2, "Cancelled"));
+                    }
+                  })
+                  .create()
+                  .show();
+            } else {
+              callResult(false, null);
+            }
+            return;
+          } catch (Exception e) {
+            invokeCallback(createErr(1, e.getMessage()));
             return;
           }
-
-          // Build the Entity URI.
-          Uri.Builder b =
-              Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, id).buildUpon();
-          b.appendPath(ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
-          contactUri = b.build();
-
-          // Create the projection (SQL fields) and sort order.
-          String[] projection = {
-              ContactsContract.Contacts.Entity.MIMETYPE, ContactsContract.Contacts.Entity.DATA1
-          };
-          String sortOrder = ContactsContract.Contacts.Entity.RAW_CONTACT_ID + " ASC";
-          cursor = this.contentResolver.query(contactUri, projection, null, null, sortOrder);
-          if (cursor == null) return;
-
-          String mime;
-          final List<CharSequence> numbers = new ArrayList<>();
-          String name = null;
-
-          int dataIdx = cursor.getColumnIndex(ContactsContract.Contacts.Entity.DATA1);
-          int mimeIdx = cursor.getColumnIndex(ContactsContract.Contacts.Entity.MIMETYPE);
-          if (cursor.moveToFirst()) {
-            do {
-              mime = cursor.getString(mimeIdx);
-              if (name == null &&
-                  ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE.equals(mime)) {
-                name = cursor.getString(dataIdx);
-              }
-              if (ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE.equals(mime)) {
-                numbers.add(cursor.getString(dataIdx));
-              }
-            } while (cursor.moveToNext());
-          }
-          cursor.close();
-
-          contactData.putString("name", name);
-
-          if (numbers.size() == 1) {
-            contactData.putString("phone", String.valueOf(numbers.get(0)));
-            callResult(true, contactData);
-          } else if (numbers.size() > 1) {
-            if (mBuilder == null)
-              mBuilder = new AlertDialog.Builder(getCurrentActivity());
-            mBuilder
-                .setTitle(name)
-                .setItems(numbers.toArray(new CharSequence[numbers.size()]),
-                    new DialogInterface.OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialogInterface, int i) {
-                        contactData.putString("phone", String.valueOf(numbers.get(i)));
-                        callResult(true, contactData);
-                      }
-                    })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                  @Override
-                  public void onCancel(DialogInterface dialogInterface) {
-                    invokeCallback(createErr(2, "Cancelled"));
-                  }
-                })
-                .create()
-                .show();
-          } else {
-            callResult(false, null);
-          }
-          return;
-        } catch (Exception e) {
-          invokeCallback(createErr(1, e.getMessage()));
-          return;
-        }
-      default:
-        invokeCallback(createErr(2, "Cancelled"));
-        break;
+        default:
+          invokeCallback(createErr(2, "Cancelled"));
+          break;
+      }
     }
   }
 
